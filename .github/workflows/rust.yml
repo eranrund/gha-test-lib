@@ -12,9 +12,13 @@ env:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latesto
 
     steps:
+    - name: Dump context
+      uses: crazy-max/ghaction-dump-context@v1
+
+
     - uses: actions/checkout@v3
       with:
         repository: eranrund/gha-test-app
@@ -30,6 +34,9 @@ jobs:
         cd ..
 
         cargo build --verbose || echo "UPREV_FAILED=1" >> "$GITHUB_ENV"
+
+    - name: Build with the 
+
     - name: Comment on PR
       uses: mshick/add-pr-comment@v1
       if: env.UPREV_FAILED == '1'

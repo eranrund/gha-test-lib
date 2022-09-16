@@ -34,8 +34,6 @@ jobs:
 
         cargo build --verbose || echo "UPREV_FAILED=1" >> "$GITHUB_ENV"
 
-    - name: Build with the 
-
     - name: Comment on PR
       uses: mshick/add-pr-comment@v1
       if: env.UPREV_FAILED == '1'

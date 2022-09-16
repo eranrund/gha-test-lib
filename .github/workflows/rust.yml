@@ -21,14 +21,17 @@ jobs:
         submodules: 'recursive'
 
     - name: Build
-      run: cargo build --verbose
+      run: |
+        cd gha-test-lib
+        git checkout suxxx
+        cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
 
     - uses: mshick/add-pr-comment@v1
       with:
         message: |
-          **Hello** ${{ secrets.GITHUB_TOKEN }}
+          **Hello**
           🌏
           !
         repo-token: ${{ secrets.GITHUB_TOKEN }}

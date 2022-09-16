@@ -50,6 +50,7 @@ runs:
       git remote set-url origin https://github.com/${{ github.repository }}
       git fetch origin ${{ github.ref }}:uprev-test
       git checkout uprev-test
+      git log -1 --format='%H'
       cd ..
 
       # Try to build

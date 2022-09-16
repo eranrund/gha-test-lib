@@ -1,3 +1,5 @@
+sux
+
 #[cfg(test)]
 mod tests {
     #[test]

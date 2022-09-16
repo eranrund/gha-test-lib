@@ -7,7 +7,7 @@ inputs:
     id:
       description: A unique identifier for this step
       required: true
-    repoToken:
+    githubToken:
       description: A GitHub token for API access.
       required: true
 
@@ -89,7 +89,7 @@ runs:
     with:
       message: |
         Heads up, I tried building XXX using this branch and it failed.
-      repo-token: ${{ secrets.GITHUB_TOKEN }}
+      repo-token: ${{ inputs.githubToken }}
       repo-token-user-login: 'github-actions[bot]' # The user.login for temporary GitHub tokens
       allow-repeats: true # This is the default
 
@@ -99,6 +99,6 @@ runs:
     with:
       message: |
         ✅ Good job, XXX was built successfully.
-      repo-token: ${{ inputs.repoToken }} 
+      repo-token: ${{ inputs.githubToken }}
       repo-token-user-login: 'github-actions[bot]' # The user.login for temporary GitHub tokens
       allow-repeats: true # This is the default

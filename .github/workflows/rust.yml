@@ -21,4 +21,4 @@ jobs:
       with:
         remoteRepo: eranrund/gha-test-app
         id: test-app
-        repoToken: ${{ secrets.GITHUB_TOKEN }}
+        githubToken: ${{ secrets.GITHUB_TOKEN }}

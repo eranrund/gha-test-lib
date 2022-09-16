@@ -25,10 +25,10 @@ jobs:
       id: cache-state
       uses: actions/cache@v3
       with:
-        path: /home/runner/.state
-        key: ${{ runner.os }}-XXX2-${{ hashFiles('janky-state/*') }}
+        path: janky-state
+        key: ${{ runner.os }}-XXX3-${{ hashFiles('janky-state/*') }}
         restore-keys: |
-          ${{ runner.os }}-XXX2-
+          ${{ runner.os }}-XXX3-
 
     - name: Build with current branch
       run: |

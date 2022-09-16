@@ -23,7 +23,7 @@ jobs:
         repository: eranrund/gha-test-app
         submodules: 'recursive'
 
-    - name: Build
+    - name: Build with current branch
       run: |
         cd gha-test-lib
         #git remote set-url origin ${{ github.repositoryUrl }} - this is git:// and GHA doesn't seem to like it
@@ -34,9 +34,23 @@ jobs:
 
         cargo build --verbose || echo "UPREV_FAILED=1" >> "$GITHUB_ENV"
 
+    - name: Build with base branch (${{ github.base_ref }})
+      if: env.UPREV_FAILED == '1'
+      run: |
+        cd gha-test-lib
+        #git remote set-url origin ${{ github.repositoryUrl }} - this is git:// and GHA doesn't seem to like it
+        git remote set-url origin https://github.com/${{ github.repository }}
+        git fetch origin ${{ github.base_ref }}:gha-test-base
+        git checkout gha-test-base
+        cd ..
+
+        cargo build --verbose && echo "BASE_FAILED=0" >> "$GITHUB_ENV" >> || echo "BASE_FAILED=1" >> "$GITHUB_ENV"
+
+
+
     - name: Comment on PR
       uses: mshick/add-pr-comment@v1
-      if: env.UPREV_FAILED == '1'
+      if: env.UPREV_FAILED == '1' && env.BASE_FAILED == '0'
       with:
         message: |
           Heads up, I tried building XXX using this branch and it failed.

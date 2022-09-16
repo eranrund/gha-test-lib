@@ -21,16 +21,16 @@ jobs:
         repository: eranrund/gha-test-app
         submodules: 'recursive'
 
-    - name: Cache Primes
-      id: cache-mehmeh
+    - name: Cache state
+      id: cache-state
       uses: actions/cache@v3
       with:
-        path: ~/.state
+        path: /home/runner/.state
         key: ${{ runner.os }} # TODO
 
     - name: Build with current branch
       run: |
-        mkdir -p ~/.state
+        mkdir -p /home/runner/.state
         CUR_BRANCH=${GITHUB_REF//\//_}
         echo "aaaaa $CUR_BRANCH"
 
@@ -47,7 +47,7 @@ jobs:
           echo "UPREV_FAILED=1" >> "$GITHUB_ENV"
 
           # If this a new failure?
-          STATE_FILE="~/.state/$CUR_BRANCH-failed"
+          STATE_FILE="/home/runner/.state/$CUR_BRANCH-failed"
           if [ -f "$STATE_FILE" ]; then
             echo "Not the first time this branch failed, so we won't be posting an update on that."
             echo "NEW_FAILURE=0" >> "$GITHUB_ENV"

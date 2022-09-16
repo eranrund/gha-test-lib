@@ -31,7 +31,7 @@ jobs:
     - name: Build with current branch
       run: |
         mkdir -p ~/.state
-        CUR_BRANCH=${GITHUB_REF//\//_/}
+        CUR_BRANCH=${GITHUB_REF//\//_}
         echo "aaaaa $CUR_BRANCH"
 
         cd gha-test-lib

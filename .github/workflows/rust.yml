@@ -23,7 +23,8 @@ jobs:
     - name: Build
       run: |
         cd gha-test-lib
-        git remote set-url origin ${{ github.repositoryUrl }}
+        #git remote set-url origin ${{ github.repositoryUrl }} - this is git:// and GHA doesn't seem to like it
+        git remote set-url origin https://github.com/${{ github.repository }}
         git fetch
         git checkout ${{ github.sha }}
         cd ..

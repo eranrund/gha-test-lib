@@ -26,15 +26,16 @@ jobs:
       uses: actions/cache@v3
       with:
         path: /home/runner/.state
-        key: ${{ runner.os }}-XXX-${{ hashFiles('/home/runner/.state/*') }}
+        key: ${{ runner.os }}-XXX-${{ hashFiles('janky-state/*') }}
         restore-keys: |
           ${{ hashFiles('**/lockfiles') }}
 
     - name: Build with current branch
       run: |
-        mkdir -p /home/runner/.state
+        STATE_DIR=$GITHUB_WORKSPACE/janky-state
+        mkdir -p $STATE_DIR
         CUR_BRANCH=${GITHUB_REF//\//_}
-        STATE_FILE="/home/runner/.state/$CUR_BRANCH-failed"
+        STATE_FILE="$STATE_DIR/$CUR_BRANCH-failed"
 
         cd gha-test-lib
         #git remote set-url origin ${{ github.repositoryUrl }} - this is git:// and GHA doesn't seem to like it

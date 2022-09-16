@@ -1,4 +1,3 @@
-sux
 
 #[cfg(test)]
 mod tests {

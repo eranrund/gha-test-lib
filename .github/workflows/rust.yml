@@ -18,6 +18,7 @@ jobs:
     - uses: actions/checkout@v3
       with:
         repository: eranrund/gha-test-app
+        submodules: 'recursive'
 
     - name: Build
       run: cargo build --verbose

@@ -10,11 +10,15 @@ inputs:
     githubToken:
       description: A GitHub token for API access.
       required: true
+    submodulePath:
+      description: The path to the submodule we are going to try upreving
+      required: true
 
 runs:
   using: composite
   steps:
 
+  # Checkout the repository we are going to try upreving in
   - uses: actions/checkout@v3
     with:
       repository: ${{ inputs.remoteRepo }}
@@ -40,13 +44,16 @@ runs:
       CUR_BRANCH=${GITHUB_REF//\//_}
       STATE_FILE="$STATE_DIR/$CUR_BRANCH-failed"
 
-      cd gha-test-lib
+      # Attempt to uprev the submodule to the latest revision in the current PR this action is running in
+      cd ${{ inputs.submodulePath }}
       #git remote set-url origin ${{ github.repositoryUrl }} - this is git:// and GHA doesn't seem to like it
       git remote set-url origin https://github.com/${{ github.repository }}
-      git fetch origin ${{ github.ref }}:gha-test
-      git checkout gha-test
+      git fetch origin ${{ github.ref }}:uprev-test
+      git checkout uprev-test
       cd ..
 
+      # Try to build
+      # TODO make this an argument, maybe run tests instead
       cargo build --verbose && {
         if [ -f "$STATE_FILE" ]; then
           echo "We previously failed building, but now we succeeded."
@@ -69,13 +76,16 @@ runs:
         fi
       }
 
+  # A step that tries to build the remote repository with the upstream branch of the current PR.
+  # We do this since if it fails, we can't blame the failure on the changes in the current PR
+  # and there is no point in posting about the failure (but we will post if this PR fixes the build).
   - name: Build with base branch (${{ github.base_ref }})
     if: env.UPREV_FAILED == '1' && env.NEW_FAILURE == '1'
     shell: bash
     run: |
       cd workdir-${{ inputs.id }}
 
-      cd gha-test-lib
+      cd ${{ inputs.submodulePath }}
       #git remote set-url origin ${{ github.repositoryUrl }} - this is git:// and GHA doesn't seem to like it
       git remote set-url origin https://github.com/${{ github.repository }}
       git fetch origin ${{ github.base_ref }}:gha-test-base
@@ -83,8 +93,6 @@ runs:
       cd ..
 
       cargo build --verbose && echo "BASE_FAILED=0" >> "$GITHUB_ENV" || echo "BASE_FAILED=1" >> "$GITHUB_ENV"
-
-
 
   - name: Comment on PR (failure)
     uses: mshick/add-pr-comment@v1

@@ -20,5 +20,6 @@ jobs:
       uses: ./.github/actions/check-dependant-rust-repo
       with:
         remoteRepo: eranrund/gha-test-app
+        submodulePath: "gha-test-lib"
         id: test-app
         githubToken: ${{ secrets.GITHUB_TOKEN }}

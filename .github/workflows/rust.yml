@@ -28,7 +28,7 @@ jobs:
         path: janky-state
         key: ${{ runner.os }}-${{ github.ref }}-XXX3-${{ hashFiles('janky-state/*') }}
         restore-keys: |
-          ${{ runner.os }}-XXX3-
+          ${{ runner.os }}-${{ github.ref }}-XXX3-
 
     - name: Build with current branch
       run: |

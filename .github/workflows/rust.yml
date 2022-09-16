@@ -29,13 +29,10 @@ jobs:
         git checkout gha-test
         cd ..
 
-        cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
-
+        cargo build --verbose || echo "UPREV_FAILED=1" >> "$GITHUB_ENV"
     - name: Comment on PR
       uses: mshick/add-pr-comment@v1
-      if: ${{ failure() }}
+      if: env.UPREV_FAILED == '1'
       with:
         message: |
           Heads up, I tried building XXX using this branch and it failed.

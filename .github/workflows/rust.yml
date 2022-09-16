@@ -1,8 +1,6 @@
 name: Rust
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
@@ -23,8 +21,19 @@ jobs:
         repository: eranrund/gha-test-app
         submodules: 'recursive'
 
+    - name: Cache Primes
+      id: cache-mehmeh
+      uses: actions/cache@v3
+      with:
+        path: ~/.state
+        key: ${{ runner.os }} # TODO
+
     - name: Build with current branch
       run: |
+        mkdir -p ~/.state
+        CUR_BRANCH=${GITHUB_REF/\//_}
+        echo "aaaaa $CUR_BRANCH"
+
         cd gha-test-lib
         #git remote set-url origin ${{ github.repositoryUrl }} - this is git:// and GHA doesn't seem to like it
         git remote set-url origin https://github.com/${{ github.repository }}
@@ -32,10 +41,25 @@ jobs:
         git checkout gha-test
         cd ..
 
-        cargo build --verbose || echo "UPREV_FAILED=1" >> "$GITHUB_ENV"
+        cargo build --verbose || {
+          # We failed building, so first keep track of that in the env so that the next steps
+          # can access this information.
+          echo "UPREV_FAILED=1" >> "$GITHUB_ENV"
+
+          # If this a new failure?
+          STATE_FILE="~/.state/$CUR_BRANCH-failed"
+          if [ -f "$STATE_FILE" ]; then
+            echo "Not the first time this branch failed, so we won't be posting an update on that."
+            echo "NEW_FAILURE=0" >> "$GITHUB_ENV"
+          else
+            echo "Detected a new failure, indicating by writing to $STATE_FILE"
+            echo > $STATE_FILE
+            echo "NEW_FAILURE=1" >> "$GITHUB_ENV"
+          fi
+        }
 
     - name: Build with base branch (${{ github.base_ref }})
-      if: env.UPREV_FAILED == '1'
+      if: env.UPREV_FAILED == '1' && env.NEW_FAILURE == '1'
       run: |
         cd gha-test-lib
         #git remote set-url origin ${{ github.repositoryUrl }} - this is git:// and GHA doesn't seem to like it
@@ -50,10 +74,10 @@ jobs:
 
     - name: Comment on PR
       uses: mshick/add-pr-comment@v1
-      if: env.UPREV_FAILED == '1' && env.BASE_FAILED == '0'
+      if: env.UPREV_FAILED == '1' && env.BASE_FAILED == '0' && env.NEW_FAILURE == '1'
       with:
         message: |
           Heads up, I tried building XXX using this branch and it failed.
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         repo-token-user-login: 'github-actions[bot]' # The user.login for temporary GitHub tokens
-        allow-repeats: false # This is the default
+        allow-repeats: true # This is the default

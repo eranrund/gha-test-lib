@@ -21,20 +21,23 @@ runs:
     with:
       repository: ${{ inputs.remoteRepo }}
       submodules: 'recursive'
+      path: workdir-${{ inputs.id }}
 
   - name: Cache state
     id: cache-state
     uses: actions/cache@v3
     with:
-      path: janky-state
-      key: ${{ runner.os }}-${{ github.ref }}-XXX4-${{ github.sha }}
+      path: state-${{ inputs.id }}
+      key: ${{ runner.os }}-${{ github.ref }}-${{ inputs.id }}-${{ github.sha }}
       restore-keys: |
-        ${{ runner.os }}-${{ github.ref }}-XXX4-
+        ${{ runner.os }}-${{ github.ref }}-${{ inputs.id }}-
 
   - name: Build with current branch
     shell: bash
     run: |
-      STATE_DIR=$GITHUB_WORKSPACE/janky-state
+      cd workdir-${{ inputs.id }}
+
+      STATE_DIR=$GITHUB_WORKSPACE/state-${{ inputs.id }}
       mkdir -p $STATE_DIR
       CUR_BRANCH=${GITHUB_REF//\//_}
       STATE_FILE="$STATE_DIR/$CUR_BRANCH-failed"
@@ -72,6 +75,8 @@ runs:
     if: env.UPREV_FAILED == '1' && env.NEW_FAILURE == '1'
     shell: bash
     run: |
+      cd workdir-${{ inputs.id }}
+
       cd gha-test-lib
       #git remote set-url origin ${{ github.repositoryUrl }} - this is git:// and GHA doesn't seem to like it
       git remote set-url origin https://github.com/${{ github.repository }}
@@ -88,7 +93,7 @@ runs:
     if: env.UPREV_FAILED == '1' && env.BASE_FAILED == '0' && env.NEW_FAILURE == '1'
     with:
       message: |
-        Heads up, I tried building XXX using this branch and it failed.
+        Heads up, I tried building ${{ inputs.id }} using this branch and it failed.
       repo-token: ${{ inputs.githubToken }}
       repo-token-user-login: 'github-actions[bot]' # The user.login for temporary GitHub tokens
       allow-repeats: true # This is the default
@@ -98,7 +103,7 @@ runs:
     if: env.UPREV_FIXED == '1'
     with:
       message: |
-        ✅ Good job, XXX was built successfully.
+        ✅ Good job, ${{ inputs.id }} was built successfully.
       repo-token: ${{ inputs.githubToken }}
       repo-token-user-login: 'github-actions[bot]' # The user.login for temporary GitHub tokens
       allow-repeats: true # This is the default

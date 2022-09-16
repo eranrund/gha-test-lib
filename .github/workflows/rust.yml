@@ -12,7 +12,10 @@ jobs:
 
     runs-on: ubuntu-latest
 
+
     steps:
+    - uses: actions/checkout@v3
+
     - name: Check that test-app still builds
       uses: ./.github/actions/check-dependant-rust-repo
       with:

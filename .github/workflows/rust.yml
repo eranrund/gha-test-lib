@@ -44,7 +44,7 @@ jobs:
         git checkout gha-test-base
         cd ..
 
-        cargo build --verbose && echo "BASE_FAILED=0" >> "$GITHUB_ENV" >> || echo "BASE_FAILED=1" >> "$GITHUB_ENV"
+        cargo build --verbose && echo "BASE_FAILED=0" >> "$GITHUB_ENV" || echo "BASE_FAILED=1" >> "$GITHUB_ENV"
 
 
 

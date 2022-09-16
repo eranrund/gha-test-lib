@@ -33,12 +33,12 @@ jobs:
     - name: Run tests
       run: cargo test --verbose
 
-    - uses: mshick/add-pr-comment@v1
+    - name: Comment on PR
+      uses: mshick/add-pr-comment@v1
+      if: ${{ failure() }}
       with:
         message: |
-          **Hello**
-          🌏
-          !
+          Heads up, I tried building XXX using this branch and it failed.
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         repo-token-user-login: 'github-actions[bot]' # The user.login for temporary GitHub tokens
         allow-repeats: false # This is the default

@@ -26,7 +26,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: janky-state
-        key: ${{ runner.os }}-XXX3-${{ hashFiles('janky-state/*') }}
+        key: ${{ runner.os }}-${{ github.ref }}-XXX3-${{ hashFiles('janky-state/*') }}
         restore-keys: |
           ${{ runner.os }}-XXX3-
 
